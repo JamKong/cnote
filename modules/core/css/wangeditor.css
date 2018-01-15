@@ -1,0 +1,16 @@
+/* wangEditor 编辑器的样式  start*/
+.article_content .w-e-text-container {
+    margin-top: -32px;
+    padding-top: 32px;
+    height: 100% !important;
+    border: 0px !important;
+    overflow-y: auto;
+}
+
+.w-e-text {
+    overflow: auto !important;
+}
+
+.w-e-text p {
+    /*line-height: 0.7em !important;*/
+}

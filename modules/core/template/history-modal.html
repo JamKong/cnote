@@ -1,0 +1,44 @@
+<div class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <!--<span role="dialog" class="sr-only"></span>-->
+    <div class="modal-dialog" style="width: 80%;height: 90%;">
+        <div class="modal-content" ng-init="findHistorys(file.path)" style="height: 100%;">
+            <div class="modal-header">
+                <button type="button" role="button" class="close" aria-label="Close" ng-click="$hide()"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title">历史版本</h3>
+            </div>
+
+            <div class="row modal-body" style="height: 100%;" >
+                <div class="col-md-2" style="height: 80%;overflow-y: auto;">
+                    <ul class="child-files" style="margin: 0;">
+                        <li ng-repeat="history in historys" ng-click="showFileContentByCommitId(history.commitId,file.path)" class="child-files-item" ng-class="{true:'active',false:''}[historyFile.commitId == history.commitId]" style="text-align: center;">
+                            <span>{{history.date +" "+ history.time}}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div ng-show="!!historyFile" class="col-md-10 diff-text" style="overflow: auto;height: 90%;">
+                    <div style="position: absolute;width: 100%;">
+                        <h2 ng-bind="historyFile.title"></h2>
+                        <div ng-bind-html="historyFile.content | to_trusted" style="margin-bottom: 100px;"></div>
+                        <div class="historyFile-options" style="position: fixed;height:55px;bottom: 100px;background-color: rgba(7,127,128,.4);padding: 10px;border: 1px solid rgba(255,255,255,.3);border-radius: 25px;">
+                            <a href="javascript:void(0)" class="btn btn-primary" ng-click="reset(file,historyFile)">恢复</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close">Close</button>-->
+                <!--<button type="button" class="btn btn-default" ng-click="rename(filename)" aria-label="Update">Update</button>-->
+            <!--</div>-->
+        </div>
+    </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $(".modal-dialog").draggable({
+		cancel: ".diff-text"
+    });//为模态对话框添加拖拽
+    $(".historyFile-options").draggable({
+
+    });
+  })
+</script>

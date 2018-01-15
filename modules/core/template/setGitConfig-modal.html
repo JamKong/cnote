@@ -1,0 +1,31 @@
+<div class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" role="button" class="close" aria-label="Close" ng-click="$hide()"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title">git SSH 远程仓库地址</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="respAddr" class="col-md-2 col-sm-2 control-label">远程仓库地址：</label>
+                        <div class="col-md-10 col-sm-10">
+                            <input type="text" id="respAddr" class="form-control" placeholder="URL" ng-model="respAddr">
+                        </div>
+                    </div>
+
+                </form>
+                <span ng-repeat="addr in respAddrList" ng-bind="addr.respAddr"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close">Close</button>
+                <button type="button" class="btn btn-default" ng-click="saveRespAddr(respAddr)" aria-label="Close">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  $(document).ready(function(){
+    $(".modal-dialog").draggable();//为模态对话框添加拖拽
+  })
+</script>

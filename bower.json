@@ -1,0 +1,35 @@
+{
+  "name": "cnote",
+  "description": "云笔记",
+  "main": "index.js",
+  "authors": [
+    "JamKong"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "cnote",
+    "云笔记"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#^1.6.2",
+    "marked": "~0.3.x",
+    "highlightjs": "~9.9.0",
+    "angular-ui-tree": "^2.22.5",
+    "angular-strap": "^2.3.12",
+    "jquery-ui": "^1.12.1",
+    "jquery": "1.9.1",
+    "wangEditor": "^3.0.12"
+  },
+  "devDependencies": {
+    "angular-ui-router": "^0.4.2",
+    "bootstrap": "^3.3.7"
+  }
+}

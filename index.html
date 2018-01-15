@@ -1,0 +1,262 @@
+<!DOCTYPE html >
+<html lang="en" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+
+    <title>CNote</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/highlightjs/styles/default.css">
+    <link rel="stylesheet" href="bower_components/angular-ui-tree/dist/angular-ui-tree.min.css">
+
+    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="lib/angular-ui-tab-scroll-master/angular-ui-tab-scroll.css" rel="stylesheet">
+
+    <link href="modules/core/css/main.css" rel="stylesheet">
+    <link href="modules/core/css/index.css" rel="stylesheet">
+    <link href="modules/core/css/modal.css" rel="stylesheet">
+    <link href="modules/core/css/wangeditor.css" rel="stylesheet">
+
+    <script type="text/javascript" src="bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="bower_components/marked/lib/marked.js"></script>
+    <script type="text/javascript" src="bower_components/highlightjs/highlight.pack.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+    <script type="text/javascript" src="bower_components/angular-strap/dist/angular-strap.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+
+
+    <script type="text/javascript" src="modules/core/main.js"></script>
+    <script type="text/javascript" src="modules/core/core.service.js"></script>
+    <script type="text/javascript" src="modules/core/directive/menu.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/markdown-editor.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/standard-editor.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/select-tab.directory.js"></script>
+
+
+    <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="lib/angular-ui-tab-scroll-master/angular-ui-tab-scroll.js"></script>
+    <script type="text/javascript" src="bower_components/wangEditor/release/wangEditor.min.js"></script>
+
+
+    <script src="node_modules/angular-drag/dist/angular-drag.js"></script>
+    <script type="text/javascript" src="modules/core/config/marked-config.js"></script>
+
+</head>
+
+<body class="main" ng-app="cnoteApp">
+<div class="container-fluid " ng-controller="FileSystemController as vm" ng-init="init()">
+    <div class="col-md-2 col-sm-2 col-xm-2 file-manage-menu" id="col-1">
+        <label class="self_note_label">个人笔记</label>
+        <ul class="root-menu ">
+            <li class="rootDir menu-item " menu-toggle="{{ {active:true} }}" context-menu menu="rootDirMenu"
+                current-window="currentWindow" ng-click="setCurrentDir('root')">
+                <i class="fa fa-caret-right icon"></i>
+                <span>文件夹</span>
+            </li>
+            <li ng-repeat="dir in dirs" ng-include="'treeItem.html'"></li>
+            <li class="menu-item child-menu" menu-toggle="{{ {isBindDbClick:false,iconIsBindClick:false} }}"
+                ng-click="setCurrentDir('trash')">
+                <i class="fa fa-trash-o fa-lg icon"></i>
+                <span>废纸篓</span>
+            </li>
+        </ul>
+        <span class="menu-separation"></span>
+        <ul>
+            <!--<li class="menu-item child-menu" ng-click="showSetGitConfigModel()">-->
+            <!--<i class="fa fa-cog fa-lg icon"></i>-->
+            <!--<span>设置</span>-->
+            <!--</li>-->
+            <li class="menu-item child-menu" ng-click="sync(0)">
+                <i class="fa fa-refresh fa-1x icon" ng-class="{true:'fa-spin',false:''}[isSyncStatus]"></i>
+                <span>同步</span>
+            </li>
+        </ul>
+        <div style="width: 3px;height: 100%;position: absolute;top: 0;right: 0px;cursor: col-resize;opacity: 0;"
+             id="drag1"
+             draggable="true"></div>
+    </div>
+
+    <div class="col-md-2 col-sm-2 col-xm-2 child-files" id="col-2">
+        <div ng-repeat="childFile in currentDir.childFiles" context-menu menu="fileMenu" current-window="currentWindow"
+             menu-modal="childFile" class="child-files-item" title="{{childFile.title}}"
+             ng-class="{true:'active',false:''}[childFile._id.toString() == currentFile._id.toString()]"
+             ng-click="setCurrentFile(childFile)" select-tab="{{childFile._id.toString()}}">
+            <img src="resources/images/article.png" style="user-select: none;">
+            <span ng-bind="childFile.title"></span>
+        </div>
+        <div style="width: 3px;height: 100%;position: absolute;top: 0;right: 0px;cursor: col-resize;opacity: 0;"
+             id="drag2"
+             draggable="true"></div>
+    </div>
+    <div class="col-md-8 col-sm-8 col-xm-8" style="height: 100%;padding: 0px 6px;" id="col-3">
+        <scrollable-tabset api="scrollableApi" auto-recalculate="true" ng-show="files && files.length>0">
+            <uib-tabset type="tabs">
+                <uib-tab ng-repeat="file in files" ng-click="setCurrentFile(file)" id="{{file._id}}" init-tab>
+                    <uib-tab-heading>
+                        <div class="text_overflow_ellipsis">
+                            <span ng-bind="file.title?file.title:'无标题'" style="margin: 0 10px 0 0;"></span>
+                            <a class="glyphicon glyphicon-remove btn form-control-feedback"
+                               style="pointer-events: auto;margin: -10px 0 0 0px;" ng-click="closeTabItem(file)"></a>
+                        </div>
+                    </uib-tab-heading>
+                    <div class="edit_context">
+                        <div class="article_context">
+                            <!-- 操作栏 -->
+                            <div class="edit_option">
+                                <div ng-if="!file.del_flag">
+                                    <a class="btn btn-default" role="button" href="#" ng-click="editorToggle()">
+                                        <i class="fa fa-pencil fa-fw"></i>
+                                        <span ng-show="file.isEditer">阅读</span>
+                                        <span ng-show="!file.isEditer">编辑</span>
+                                    </a>
+                                    <a class="btn btn-default" href="#" ng-click="deleteFile(file)"><i
+                                            class="fa fa-trash-o fa-lg"></i></a>
+                                </div>
+                                <div ng-if="file.del_flag">
+                                    <a class="btn btn-default" href="#" title="恢复" ng-click="recoverDeleteFile(file)"><i
+                                            class="fa fa-reply fa-lg"></i></a>
+                                    <a class="btn btn-default" href="#" title="永久删除" ng-click="foreverDeleteFile(file)"><i
+                                            class="fa fa-trash fa-lg"></i></a>
+                                </div>
+                            </div>
+                            <!-- 标题 -->
+                            <input type="text" class="article_title" ng-model="currentFile.titleTemp"
+                                   ng-blur="updateTitle(currentFile._id,currentFile.titleTemp)">
+                            <div class="article_info" ng-show="!currentFile.isEditer">
+                                <small ng-bind="'创建时间：'+(currentFile.createDate|date:'yyyy/MM/dd HH:mm:ss')"></small>
+                                <small ng-bind="'更新时间：'+(currentFile.updateDate|date:'yyyy/MM/dd HH:mm:ss')"></small>
+                            </div>
+                            <!-- Markdown语法编辑器 -->
+                            <div class="article_content">
+                                <div ng-if="isMarkdownFile()" class="article_content_editor">
+                                    <div class="col-md-6 col-sm-6 editor_left" ng-show="currentFile.isEditer">
+                                        <textarea class="form-control" id="inputText" ng-model="currentFile.content"
+                                                  ng-trim="false"
+                                                  markdown-editor input-text="currentFile.content"></textarea>
+                                    </div>
+                                    <div class="editor_right"
+                                         ng-class="{true:'col-md-6 col-sm-6',false:'col-md-12 col-sm-12'}[currentFile.isEditer]">
+                                        <div id="outputText" ng-bind-html="currentFile.outputText"></div>
+                                    </div>
+                                </div>
+                                <div ng-if="!isMarkdownFile()" class="article_content_editor">
+                                    <div ng-show="!currentFile.isEditer" ng-bind-html="currentFile.outputText"></div>
+                                    <div ng-show="currentFile.isEditer" style="height: 100%;">
+                                        <div standard-editor="standardEditor_{{currentFile._id}}"
+                                             input-text="currentFile.content"
+                                             style="height:100%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <span class="line"></span>
+                        <span class="line" style="width: 96%"></span>
+                        <span class="line" style="width: 94%"></span>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </scrollable-tabset>
+        <div ng-show="!files || files.length<=0">
+
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/ng-template" id="treeItem.html">
+    <ul class="child-menu" context-menu menu="childDirMenu" current-window="currentWindow" menu-modal="dir">
+        <li class="menu-item text_overflow_ellipsis" menu-toggle ng-click="setCurrentDir(dir)">
+            <i class="fa icon" ng-class="{true:'fa-caret-right',false:''}[dir.childrens && dir.childrens.length>0]"></i>
+            <span ng-bind="dir.name"></span>
+        </li>
+        <li ng-repeat="dir in dir.childrens" ng-include="'treeItem.html'" style="display: none;"></li>
+    </ul>
+</script>
+<script type="text/javascript">
+
+	var dragdiv1 = document.querySelector('#drag1');
+	var dragdiv2 = document.querySelector('#drag2');
+	var col_1 = document.querySelector('#col-1');
+	var col_2 = document.querySelector('#col-2');
+	var col_3 = document.querySelector('#col-3');
+
+
+	var x;  //记录到点击时鼠标到移动框左边和上边的距离
+	var curCol = null;
+	var col_1_width = 0;
+	var col_2_width = 0;
+	var moveDirection = 0;
+	dragdiv1.ondragstart = dragStart;
+	dragdiv2.ondragstart = dragStart;
+
+	function dragStart(e) {
+		e.dataTransfer.effectAllowed = "move";  //移动效果
+		e.dataTransfer.setData("Text", "");  //附加数据，　没有这一项，firefox中无法移动
+		x = e.clientX;
+		col_1_width = col_1.offsetWidth;
+		col_2_width = col_2.offsetWidth;
+		if (e.target.id == "drag1") {
+			curCol = "col-1";
+		} else {
+			curCol = "col-2";
+		}
+
+	}
+
+	document.addEventListener('dragover', function (e) {//取消冒泡 ,不取消则不能触发 drop事件
+		var drag1_right = dragdiv1.getBoundingClientRect().right;
+		var drag2_right = dragdiv2.getBoundingClientRect().right;
+		var documentWidth = document.body.clientWidth;
+		moveDirection = e.pageX - x; //移动方向，正-右，负-左
+		if (curCol == "col-1") {
+			if (drag1_right / documentWidth < 0.1 && moveDirection < 0) {
+				return;
+			}
+
+//			console.log("(documentWidth - drag2_right)/documentWidth:" + (documentWidth - drag2_right) / documentWidth)
+			if ((0.9 * documentWidth - e.pageX ) / documentWidth < 0.4) {
+				return;
+			}
+			col_1.style.width = e.pageX + 'px';
+			col_2.style.width = (drag2_right - e.pageX < 0.1 * documentWidth ? 0.1 * documentWidth : drag2_right - e.pageX) + "px";
+			col_3.style.width = documentWidth - drag2_right + "px";
+		} else {
+			if (e.pageX / documentWidth >= 0.6 && moveDirection > 0) {
+				col_3.style.width = 0.4 * documentWidth + "px";
+				return;
+			}
+
+			if (e.pageX - drag1_right <= 0.1 * documentWidth && moveDirection < 0) {
+				col_2.style.width = 0.1 * documentWidth + 'px';
+				console.log("drag1_right - (e.pageX - 0.1 * documentWidth):" + (drag1_right - (e.pageX - 0.1 * documentWidth)))
+				col_1.style.width = ((e.pageX - 0.1 * documentWidth <= 0.1 * documentWidth) ? 0.1 * documentWidth : e.pageX - 0.1 * documentWidth) + 'px';
+			} else {
+				col_2.style.width = e.pageX - drag1_right + 'px';
+			}
+
+			col_3.style.width = documentWidth - drag2_right - 10 + "px";
+
+		}
+		e.preventDefault() || e.stopPropagation();
+	}, false);
+
+	document.addEventListener('drop', function (e) {
+		//		col_1.style.width = (e.pageX - x) + 'px';
+		//			col_1.style.top = (e.pageY - y) + 'px';
+		curCol = null;
+		e.preventDefault() || e.stopPropagation();  //不取消，firefox中会触发网页跳转到查找setData中的内容
+	}, false);
+
+
+	//    var E = window.wangEditor;
+	//    var editor = new E('#div1')
+	//    editor.create()
+</script>
+</html>

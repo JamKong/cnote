@@ -1,0 +1,47 @@
+{
+  "name": "cnote",
+  "version": "1.0.0",
+  "description": "云笔记",
+  "productName": "CNote",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "packager": "electron-packager . Cnote --platform=darwin --arch=x64 --electron-version=1.7.9 --out ../OutApp --ignore=logs --ignore=OutApp --overwrite --icon=resources/images/cnote.icns",
+    "dist": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+ 
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JamKong/cnote.git"
+  },
+  "keywords": [
+    "cnote",
+    "云笔记"
+  ],
+  "author": "JamKong",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.6.4",
+    "angular-drag": "0.0.1-beta",
+    "angular-ui-bootstrap": "^2.5.0",
+    "bootstrap": "^3.3.5",
+    "config": "^1.25.1",
+    "cson": "^4.1.0",
+    "electron-context-menu": "^0.9.0",
+    "electron-node-config": "^1.1.0",
+    "font-awesome": "^4.7.0",
+    "images": "^3.0.0",
+    "jquery": "^1.9.1",
+    "lodash": "^4.17.4",
+    "log4js": "^0.6.29",
+    "moment": "^2.18.1",
+    "nedb": "^1.8.0",
+    "shelljs": "^0.7.8",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {
+    "asar": "^0.14.0"
+  }
+}

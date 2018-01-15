@@ -1,0 +1,4 @@
+/*angularjs strap 模态框的样式*/
+.modal-backdrop{
+    background-color: rgba(0,0,0,.5);
+}

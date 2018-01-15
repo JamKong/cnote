@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+
+    <title>CNote</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/highlightjs/styles/default.css">
+    <link rel="stylesheet" href="bower_components/angular-ui-tree/dist/angular-ui-tree.min.css">
+
+    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="lib/angular-ui-tab-scroll-master/angular-ui-tab-scroll.css" rel="stylesheet">
+
+    <link href="modules/core/css/main.css" rel="stylesheet">
+    <link href="modules/core/css/index.css" rel="stylesheet">
+    <link href="modules/core/css/modal.css" rel="stylesheet">
+    <link href="modules/core/css/wangeditor.css" rel="stylesheet">
+
+    <script type="text/javascript" src="bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="bower_components/marked/lib/marked.js"></script>
+    <script type="text/javascript" src="bower_components/highlightjs/highlight.pack.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+    <script type="text/javascript" src="bower_components/angular-strap/dist/angular-strap.min.js"></script>
+    <script type="text/javascript" src="bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+
+
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="modules/core/main.js"></script>
+    <script type="text/javascript" src="modules/core/config.client.controller.js"></script>
+    <script type="text/javascript" src="modules/core/localRespService.js"></script>
+    <script type="text/javascript" src="modules/core/directive/menu.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/markdown-editor.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/standard-editor.directory.js"></script>
+    <script type="text/javascript" src="modules/core/directive/select-tab.directory.js"></script>
+
+
+    <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="lib/angular-ui-tab-scroll-master/angular-ui-tab-scroll.js"></script>
+    <script type="text/javascript" src="bower_components/wangEditor/release/wangEditor.min.js"></script>
+
+
+    <script src="node_modules/angular-drag/dist/angular-drag.js"></script>
+    <script type="text/javascript" src="modules/core/config/marked-config.js"></script>
+    <style>
+        .main {
+            user-select: none;
+        }
+
+        .resps {
+            background-color: #393839;
+            margin: 0;
+            height: 100%;
+            color: #BBBABB;
+            padding: 0px;
+            width: 38.5%;
+            overflow-y: auto;
+        }
+
+        .resp_item {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 6px 30px;
+            position: relative;
+        }
+
+        .resp_item:hover {
+            background: #3d94d7;
+            color: #fff;
+        }
+
+        .resp_item_path {
+            /*word-wrap: break-word;*/
+            /*word-break: break-all;*/
+        }
+
+        .resp_item_close {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            cursor: default;
+            z-index: 10;
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .resp_item_close:hover {
+            font-size: 18px;
+        }
+
+        .select_option {
+            display: block;
+            color: #BBBABB;
+
+        }
+
+        .select_option:link, .select_option:visited, .select_option:active {
+            color: #BBBABB;
+            text-decoration: none;
+        }
+
+        .select_option:hover {
+            color: #B6701E;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+
+    </style>
+    <script type="text/javascript">
+			function stopPropagation(e) {
+				e.stopPropagation();
+			}
+
+			$(document).ready(function () {
+
+				$(".resp_item_close").click(function (event) {
+					event.stopPropagation();
+				});
+			});
+    </script>
+</head>
+
+<body class="main" ng-app="cnoteApp">
+<div class="row" ng-controller="ConfigController as vm" ng-init="init()"
+     style="width: 100%;overflow: hidden;margin: 0;height: 100%;">
+    <div class="col-sm-5 col-md-5 col-lg-5 resps">
+        <p class="resp_item" ng-repeat="resp in localRespList track by $index" ng-click="selectedResp(resp.path)"
+           ng-mouseover="resp.showClose=true" ng-mouseleave="resp.showClose=false">
+            <span style="display: inline-block;width: 100%;" ng-bind="resp.name"></span>
+            <small ng-bind="resp.path" class="resp_item_path"></small>
+            <span ng-show="resp.showClose" class="resp_item_close" ng-click="delLocalResp(resp._id)"
+                  onclick="stopPropagation(event)">x</span>
+        </p>
+
+    </div>
+    <div class="col-sm-7 col-md-7 col-lg-7"
+         style="background-color: #45464A;color: #BBBABB;margin: 0;height: 100%;width: 61.5%;text-align: center;">
+        <div style="margin-top: 30px;">
+            <img src="./resources/images/cnote.png" draggable="false">
+            <p>
+                <span style="display: block;font-size: 26px;" ng-bind="appName"></span>
+                <small style="color: #807F80;font-size: 14px" ng-bind="'version '+version"></small>
+            </p>
+            <div style="width: 250px;margin: 20px auto 0 auto;text-align: left;">
+                <a class="select_option">Create New Notebook</a>
+                <a class="select_option">Import Notebook</a>
+                <a class="select_option" ng-click="openModel()">Open</a>
+                <a class="select_option">Check out from Version Control</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+</script>
+</body>
+
+</html>
