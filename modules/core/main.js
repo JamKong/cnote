@@ -355,8 +355,12 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 				if (isMarkdownFile()) {
 					$scope.currentFile.outputText = $sce.trustAsHtml(marked(f.content));
 				} else {
-					console.log("$scope.currentFile.content:" + $scope.currentFile.content);
-					$scope.currentFile.outputText = $sce.trustAsHtml(f.content);
+					// console.log("$scope.currentFile.content:" + $scope.currentFile.content);
+					if(!!$scope.currentFile.editor){
+						$scope.currentFile.editor.onlyRead();
+						$scope.currentFile.editor.txt.html(f.content);
+					}
+
 					// $scope.standardEditor.txt.html($scope.currentFile.outputText);
 				}
 				$scope.busy = false;
@@ -369,9 +373,6 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 			$scope.busy = false;
 			if (isMarkdownFile()) {
 				$scope.currentFile.outputText = $sce.trustAsHtml(marked($scope.currentFile.content));
-			} else {
-				$scope.currentFile.outputText = $sce.trustAsHtml($scope.currentFile.content);
-				// $scope.standardEditor.txt.html($scope.currentFile.outputText);
 			}
 			$scope.currentFile.titleTemp = $scope.currentFile.title;//增加标题副本，在对标题进行修改的时候，先修改该副本，再把副本的内容更新到数据库中的去
 		}
@@ -390,7 +391,7 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 					if (isMarkdownFile()) {
 						$scope.currentFile.outputText = $sce.trustAsHtml(marked(current));
 					} else {
-						$scope.currentFile.outputText = $sce.trustAsHtml(current);
+						// $scope.currentFile.outputText = $sce.trustAsHtml(current);
 					}
 				}
 			});
@@ -411,10 +412,16 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 		$scope.currentFile.isEditer = !$scope.currentFile.isEditer;
 
 		if (!$scope.currentFile.isEditer) {
+
 			if (!!$scope.currentFile.destroy) {
 				$scope.currentFile.destroy();//销毁监听器
 				$scope.currentFile.destroy = null;
 			}
+			// wangeditor编辑器改成只读状态
+			if(!!$scope.currentFile.editor){
+				$scope.currentFile.editor.onlyRead();
+			}
+
 			cnoteAppService.updateFileToDBAndDisk($scope.currentFile).then(function (newFile) {
 				//alert("保存成功！");
 			}).catch(function (err) {
@@ -422,18 +429,17 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 				alert(err.stack);
 			});
 		} else {
-			if ($scope.currentFile.isEditer) {
+			// wangeditor编辑器改成编辑状态
+			if(!!$scope.currentFile.editor){
+				$scope.currentFile.editor.edit();
+			}
+			// markdown编辑器开启内容监听
+			if (isMarkdownFile()) {
 				$scope.currentFile.destroy = $scope.$watch('currentFile.content', function (current, original) {
-					if (!!current) {
-						if (isMarkdownFile()) {
-							$scope.currentFile.outputText = $sce.trustAsHtml(marked(current));
-						} else {
-							$scope.currentFile.outputText = $sce.trustAsHtml(current);
-						}
-
-					}
+					$scope.currentFile.outputText = $sce.trustAsHtml(marked(current));
 				});
 			}
+
 		}
 	}
 
@@ -590,6 +596,7 @@ cnoteApp.controller('FileSystemController', ['$rootScope', '$scope', 'cnoteAppSe
 			}
 			$scope.files.splice(tabIndex, 1);
 			$scope.scrollableApi.doRecalculate();//重新计算tab宽度
+
 		}
 	}
 

@@ -10,27 +10,22 @@ var spawn = require('child_process').spawn,
     , shell = require('shelljs')
     , logger = require(path.resolve('./config/lib/logHelper.js')).helper;
 
-// 初始化，获取路径信息
-var remoteRepo = config.remoteRepo||"";//TODO 以后改成数据库存储，而不是用配置文件
-var username = remoteRepo.substring(remoteRepo.indexOf(":") + 1, remoteRepo.indexOf("/")).toLocaleLowerCase();
-var repoName = remoteRepo.substring(remoteRepo.indexOf("/") + 1, remoteRepo.indexOf(".git")).toLocaleLowerCase();
-var userPath = path.resolve(config.get("rootPath"), './' + username); //用户目录
-var localRepoPath = path.resolve(userPath, "./" + repoName);    //该用户的仓库目录
+var rootPath = config.get("rootPath");
 
 var task = null;
 var delay = 2 * 60 * 1000;//
-//初始化远程仓库
+//初始化远程仓库 TODO 未完成
 exports.initRemoteRepo = function () {
-    logger.logDebug('执行初始化远程仓库脚本');
-    shell.exec('sh ' + path.resolve(process.cwd(), './shell/init_repo.sh') + ' ' + userPath + ' ' + remoteRepo, function (code, stdout, stderr, st1, st2) {
-        logger.logDebug('Exit code:', code);
-        //logger.logDebug('Program output:', stdout);
-        if (stderr && stderr.indexOf('Cloning into') != 0) {
-            logger.logDebug("初始化远程仓库出错！");
-            logger.logDebug('Program stderr:', stderr);
-            logger.logError('执行脚本 init_repo 出错：%o', stderr);
-        }
-    });
+    // logger.logDebug('执行初始化远程仓库脚本');
+    // shell.exec('sh ' + path.resolve(process.cwd(), './shell/init_repo.sh') + ' ' + userPath + ' ' + remoteRepo, function (code, stdout, stderr, st1, st2) {
+    //     logger.logDebug('Exit code:', code);
+    //     //logger.logDebug('Program output:', stdout);
+    //     if (stderr && stderr.indexOf('Cloning into') != 0) {
+    //         logger.logDebug("初始化远程仓库出错！");
+    //         logger.logDebug('Program stderr:', stderr);
+    //         logger.logError('执行脚本 init_repo 出错：%o', stderr);
+    //     }
+    // });
 };
 
 
@@ -45,7 +40,7 @@ exports.sync = function (_delay, cb) {
     task = setTimeout(function () {
         logger.logDebug('该目录已经与远程分支进行了链接');
         logger.logDebug("同步开始");
-        shell.exec('sh ' + path.resolve(process.cwd(), './shell/sync_repo.sh') + ' ' + localRepoPath, function (code, stdout, stderr, st1, st2) {
+        shell.exec('sh ' + path.resolve(process.cwd(), './shell/sync_repo.sh') + ' ' + rootPath, function (code, stdout, stderr, st1, st2) {
             logger.logDebug('Exit code:', code);
             //logger.logDebug('Program output:', stdout);
             if (code == 0) {
@@ -65,7 +60,7 @@ exports.sync = function (_delay, cb) {
 
 exports.commitLogs = function (filePath,cb) {
 	logger.logDebug('执行获取提交历史记录脚本');
-	shell.exec('sh ' + path.resolve(process.cwd(), './shell/commit_log.sh') + ' ' + localRepoPath + ' ' +  filePath, function (code, stdout, stderr, st1, st2) {
+	shell.exec('sh ' + path.resolve(process.cwd(), './shell/commit_log.sh') + ' ' + rootPath + ' ' +  filePath, function (code, stdout, stderr, st1, st2) {
 		console.log('Exit code:', code);
 		console.log('Program stdout:', stdout);
 		console.log('Program stderr:', stderr);
@@ -98,7 +93,7 @@ exports.commitLogs = function (filePath,cb) {
 
 exports.diffByCommitId = function (commitId1,commitId2,cb) {
 	logger.logDebug('执行比较脚本');
-	shell.exec('sh ' + path.resolve(process.cwd(), './shell/diff_commit.sh') + ' ' + localRepoPath + ' ' +  commitId1 +" " + commitId2 , function (code, stdout, stderr, st1, st2) {
+	shell.exec('sh ' + path.resolve(process.cwd(), './shell/diff_commit.sh') + ' ' + rootPath + ' ' +  commitId1 +" " + commitId2 , function (code, stdout, stderr, st1, st2) {
 		console.log('Exit code:', code);
 		console.log('Program stdout:', stdout);
 		console.log('Program stderr:', stderr);
@@ -126,7 +121,7 @@ exports.diffByCommitId = function (commitId1,commitId2,cb) {
 exports.showFileContentByCommitId = function (commitId,filename,cb) {
 	logger.logDebug('执行 获取该文件的某个历史版本内容 脚本');
 	filename = filename.substring(1);//去掉头个字符 "/"
-	shell.exec('sh ' + path.resolve(process.cwd(), './shell/show_commit_file.sh') + ' ' + localRepoPath + ' ' +  commitId +" " + filename , function (code, stdout, stderr, st1, st2) {
+	shell.exec('sh ' + path.resolve(process.cwd(), './shell/show_commit_file.sh') + ' ' + rootPath + ' ' +  commitId +" " + filename , function (code, stdout, stderr, st1, st2) {
 		console.log('Exit code:', code);
 		console.log('Program stdout:', stdout);
 		console.log('Program stderr:', stderr);

@@ -13,12 +13,12 @@ console.log("username:", username);
 console.log("repoName:", repoName);
 
 // 各种相对路径
-var userPath = '/' + username;         //用户目录
-var localRepoPath = path.resolve(userPath, "./" + repoName);    //该用户的仓库目录
+// var userPath = '/' + username;         //用户目录
+// var localRepoPath = path.resolve(userPath, "./" + repoName);    //该用户的仓库目录
 var articlesPath = "/articles";   //该用户的当前仓库下的文章目录
 var imagsPath = '/imags';         //图片目录地址
 var dbsPath = '/dbs';             //数据库目录地址
-var gitFilePath = path.resolve(localRepoPath, './.git');        //该用户的仓库目录下的.git文件地址
+// var gitFilePath = path.resolve(localRepoPath, './.git');        //该用户的仓库目录下的.git文件地址
 
 //创建多层文件夹 同步
 function mkdirsSync(dirpath, mode) {
@@ -52,9 +52,9 @@ module.exports.mkdirsSync = mkdirsSync;
 module.exports.remoteRepo = remoteRepo;
 module.exports.username = username;
 module.exports.repoName = repoName;
-module.exports.userPath = userPath;
-module.exports.localRepoPath = localRepoPath;
+// module.exports.userPath = userPath;
+// module.exports.localRepoPath = localRepoPath;
 module.exports.articlesPath = articlesPath;
 module.exports.imagsPath = imagsPath;
 module.exports.dbsPath = dbsPath;
-module.exports.gitFilePath = gitFilePath;
+// module.exports.gitFilePath = gitFilePath;

@@ -7,7 +7,7 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "packager": "electron-packager . Cnote --platform=darwin --arch=x64 --electron-version=1.7.9 --out ../OutApp --ignore=logs --ignore=OutApp --overwrite --icon=resources/images/cnote.icns",
+    "packager": "electron-packager . cnote --platform=darwin --arch=x64 --electron-version=1.7.9 --out ../OutApp --ignore=logs --ignore=OutApp --overwrite --icon=resources/images/cnote.icns",
     "dist": "electron-builder",
     "pack": "electron-builder --dir"
   },

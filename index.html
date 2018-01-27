@@ -111,9 +111,10 @@
                             <div class="edit_option">
                                 <div ng-if="!file.del_flag">
                                     <a class="btn btn-default" role="button" href="#" ng-click="editorToggle()">
-                                        <i class="fa fa-pencil fa-fw"></i>
-                                        <span ng-show="file.isEditer">阅读</span>
-                                        <span ng-show="!file.isEditer">编辑</span>
+                                        <i ng-show="!file.isEditer" class="fa fa-pencil fa-lg"></i>
+                                        <i ng-show="file.isEditer" class="fa fa-lock fa-lg"></i>
+                                        <!--<span ng-show="file.isEditer">阅读</span>-->
+                                        <!--<span ng-show="!file.isEditer">编辑</span>-->
                                     </a>
                                     <a class="btn btn-default" href="#" ng-click="deleteFile(file)"><i
                                             class="fa fa-trash-o fa-lg"></i></a>
@@ -132,9 +133,10 @@
                                 <small ng-bind="'创建时间：'+(currentFile.createDate|date:'yyyy/MM/dd HH:mm:ss')"></small>
                                 <small ng-bind="'更新时间：'+(currentFile.updateDate|date:'yyyy/MM/dd HH:mm:ss')"></small>
                             </div>
-                            <!-- Markdown语法编辑器 -->
+
                             <div class="article_content">
-                                <div ng-if="isMarkdownFile()" class="article_content_editor">
+                                <!-- Markdown语法编辑器 -->
+                                <div ng-show="isMarkdownFile()" class="article_content_editor">
                                     <div class="col-md-6 col-sm-6 editor_left" ng-show="currentFile.isEditer">
                                         <textarea class="form-control" id="inputText" ng-model="currentFile.content"
                                                   ng-trim="false"
@@ -145,13 +147,14 @@
                                         <div id="outputText" ng-bind-html="currentFile.outputText"></div>
                                     </div>
                                 </div>
-                                <div ng-if="!isMarkdownFile()" class="article_content_editor">
-                                    <div ng-show="!currentFile.isEditer" ng-bind-html="currentFile.outputText"></div>
-                                    <div ng-show="currentFile.isEditer" style="height: 100%;">
-                                        <div standard-editor="standardEditor_{{currentFile._id}}"
-                                             input-text="currentFile.content"
-                                             style="height:100%;">
-                                        </div>
+                                <div ng-show="!isMarkdownFile()" class="article_content_editor">
+                                    <!--<div ng-show="!currentFile.isEditer" ng-bind-html="currentFile.outputText"></div>-->
+                                    <!--<div ng-show="currentFile.isEditer" style="height: 100%;">-->
+                                        <!---->
+                                    <!--</div>-->
+                                    <div standard-editor="standardEditor_{{currentFile._id}}"
+                                         current-file="currentFile"
+                                         style="height:100%;">
                                     </div>
                                 </div>
                             </div>

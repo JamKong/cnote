@@ -14,3 +14,10 @@
 .w-e-text p {
     /*line-height: 0.7em !important;*/
 }
+
+.w-e-text-container{
+    z-index: 2!important;
+}
+.w-e-menu{
+    z-index: 3!important;
+}

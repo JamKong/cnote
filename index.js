@@ -34,7 +34,7 @@ function openConfigWindow(closeCallback) {
 		var cf = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), './config/default.json')).toString());
 		cf.rootPath = respPath;
 		try {
-			fs.writeFileSync('./config/default.json', JSON.stringify(cf));
+			fs.writeFileSync(path.resolve(process.cwd(), './config/default.json'), JSON.stringify(cf));
 		} catch (e) {
 			logger.logDebug(e);
 		}
@@ -42,34 +42,33 @@ function openConfigWindow(closeCallback) {
 		delete require.cache[require.resolve('config')];
 		config = require('config');
 		// dialog.showMessageBox({message: JSON.stringify(config)});
+		openMainWindow();
 		configWindow.close();
 		configWindow = null;
-		openMainWindow();
 	});
 
-	if (process.platform === 'darwin') {
-		var forceQuit = false;
-		app.on('before-quit', function () {
-			forceQuit = true;
-		});
-		configWindow.on('close', function (event) {
-			if (!forceQuit) {
-				event.preventDefault();
-				configWindow.hide();
-			}
-			closeCallback();
-		});
-	}
+	// if (process.platform === 'darwin') {
+	// 	// var forceQuit = false;
+	// 	// app.on('before-quit', function () {
+	// 	// 	forceQuit = true;
+	// 	// });
+	// 	// configWindow.on('close', function (event) {
+	// 	// 	// if (!forceQuit) {
+	// 	// 	// 	event.preventDefault();
+	// 	// 	// 	configWindow.hide();
+	// 	// 	// }
+	// 	//
+	// 	// });
+	// }
 
 	configWindow.setMenu(null);
 }
 
 function openMainWindow() {
-	mainWindow = new BrowserWindow({icon: null});
+	mainWindow = new BrowserWindow({icon: null, width: 1200, height: 800});
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	//开发模式
-	mainWindow.webContents.openDevTools();
-
+	// mainWindow.webContents.openDevTools();
 	if (process.platform === 'darwin') {
 		var forceQuit = false;
 		app.on('before-quit', function () {
@@ -83,14 +82,89 @@ function openMainWindow() {
 		});
 	}
 	mainWindow.setMenu(null);
+	var template = [
+		{
+			label: 'Edit',
+			submenu: [
+				{role: 'undo'},
+				{role: 'redo'},
+				{type: 'separator'},
+				{role: 'cut'},
+				{role: 'copy'},
+				{role: 'paste'},
+				{role: 'pasteandmatchstyle'},
+				{role: 'delete'},
+				{role: 'selectall'}
+			]
+		},
+		{
+			label: 'View',
+			submenu: [
+				{role: 'reload'},
+				{role: 'forcereload'},
+				{role: 'toggledevtools'},
+				{type: 'separator'},
+				{role: 'resetzoom'},
+				{role: 'zoomin'},
+				{role: 'zoomout'},
+				{type: 'separator'},
+				{role: 'togglefullscreen'}
+			]
+		},
+		{
+			role: 'window',
+			submenu: [
+				{role: 'minimize'},
+				{role: 'close'}
+			]
+		}
+	];
 
+	if (process.platform === 'darwin') {
+		template.unshift({
+			label: app.getName(),
+			submenu: [
+				{role: 'about'},
+				{type: 'separator'},
+				{role: 'services', submenu: []},
+				{type: 'separator'},
+				{role: 'hide'},
+				{role: 'hideothers'},
+				{role: 'unhide'},
+				{type: 'separator'},
+				{role: 'quit'}
+			]
+		})
+
+		// Edit menu
+		template[1].submenu.push(
+			{type: 'separator'},
+			{
+				label: 'Speech',
+				submenu: [
+					{role: 'startspeaking'},
+					{role: 'stopspeaking'}
+				]
+			}
+		)
+
+		// Window menu
+		template[3].submenu = [
+			{role: 'close'},
+			{role: 'minimize'},
+			{role: 'zoom'},
+			{type: 'separator'},
+			{role: 'front'}
+		]
+	}
+
+	var menu = Menu.buildFromTemplate(template)
+	Menu.setApplicationMenu(menu);
 }
 
 app.on('ready', function () {
 	//显示配置窗口
-	openConfigWindow(function () {
-		// init();
-	});
+	openConfigWindow();
 
 	if (process.platform === 'win32') {
 		showTray();
@@ -189,24 +263,24 @@ app.on('activate', function () {
 // });
 
 //TODO 先实现根据在default.json中配置好远程仓库地址，进行版本控制；后期改成数据库获取远程仓库地址，可以多个~
-function init() {
-	console.log("path.resolve(utils.userPath):" + path.resolve(utils.userPath));
-	dirCheckAndAdd(path.resolve(config.get('rootPath'), '.' + utils.userPath));
-	// dirCheckAndAdd(path.resolve(utils.articlesPath));
-	// dirCheckAndAdd(path.resolve(utils.imagsPath));
-	// dirCheckAndAdd(path.resolve(utils.dbsPath));
-
-	if (!fs.existsSync(path.resolve(config.get('rootPath'), '.' + utils.gitFilePath))) {//判断是否有.git文件，来判断是否已经创建好了Git仓库
-		console.log('初始化...');
-		var gitApi = require(path.resolve(process.cwd(), './modules/git-api'));
-		gitApi.initRemoteRepo();
-	} else {
-		//一启动就同步
-		// gitApi.sync(0);
-
-	}
-
-}
+// function init() {
+// 	console.log("path.resolve(utils.userPath):" + path.resolve(utils.userPath));
+// 	dirCheckAndAdd(path.resolve(config.get('rootPath'), '.' + utils.userPath));
+// 	// dirCheckAndAdd(path.resolve(utils.articlesPath));
+// 	// dirCheckAndAdd(path.resolve(utils.imagsPath));
+// 	// dirCheckAndAdd(path.resolve(utils.dbsPath));
+//
+// 	if (!fs.existsSync(path.resolve(config.get('rootPath'), '.' + utils.gitFilePath))) {//判断是否有.git文件，来判断是否已经创建好了Git仓库
+// 		console.log('初始化...');
+// 		var gitApi = require(path.resolve(process.cwd(), './modules/git-api'));
+// 		gitApi.initRemoteRepo();
+// 	} else {
+// 		//一启动就同步
+// 		// gitApi.sync(0);
+//
+// 	}
+//
+// }
 
 
 function dirCheckAndAdd(dirPath) {

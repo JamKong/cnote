@@ -9,17 +9,56 @@ cnoteApp.directive("standardEditor", ["$window", "$sce", "$timeout", function ($
 	return {
 		restrict: 'A',
 		scope: {
-			inputText: "="
+			currentFile: "="
 		},
-		link: function (scope, ele, attrs) {
-			// alert("..");
-			var inputTextTemp = scope.inputText;
-			console.log("inputTextTemp:" + inputTextTemp);
+		link: function (scope, ele, attrs, ctrl) {
+			// console.log("content:" + content);
 			//ele[0].id = attrs['standardEditor'];
-			if (ele.children('#' + attrs['standardEditor']).length == 0) {
-				ele.append('<div id="' + attrs['standardEditor'] + '" style="height: 100%;"></div>');
+			if (ele.children('#toolbar_' + attrs['standardEditor']).length == 0) {
+				ele.append('<div id="toolbar_' + attrs['standardEditor'] + '"></div>');
+				ele.append('<div id="text_' + attrs['standardEditor'] + '" style="height: 100%;"></div>');
+				var editor = createEditor();
+				editor.create();
+				// 禁止编辑
+				editor.$textElem.attr('contenteditable', false);
+
+				scope.currentFile.editor = editor;
+
+				// console.log("attrs['standardEditor']:"+attrs['standardEditor'])
+				scope.currentFile.editor.onlyRead = function () {
+					// console.log(ele.children(".w-e-toolbar"))
+					scope.currentFile.editor.$textElem.attr('contenteditable', false);
+					ele.children(".w-e-toolbar").addClass("hide");
+				};
+				scope.currentFile.editor.edit = function () {
+					scope.currentFile.editor.$textElem.attr('contenteditable', true);
+					ele.children(".w-e-toolbar").removeClass("hide");
+				};
+
+				if(!!scope.currentFile.isEditer){
+					scope.currentFile.editor.edit();
+				}else{
+					scope.currentFile.editor.onlyRead();
+				}
+			}
+			var content = scope.currentFile.content;
+
+			editor.txt.html($sce.trustAsHtml(content));
+
+			editor.customConfig.onchange = function (html) {
+				// html 即变化之后的内容
+				// console.log(html);
+				scope.currentFile.content = html;
+				scope.$apply();
+			};
+
+
+
+
+
+			function createEditor(){
 				var E = $window.wangEditor;
-				var editor = new E("#" + attrs['standardEditor']);
+				var editor = new E("#toolbar_" + attrs['standardEditor'], "#text_" + attrs['standardEditor']);
 				// 关闭粘贴样式的过滤
 				editor.customConfig.pasteFilterStyle = false;
 				// editor.customConfig.uploadImgShowBase64 = true;  // 使用 base64 保存图片
@@ -74,16 +113,9 @@ cnoteApp.directive("standardEditor", ["$window", "$sce", "$timeout", function ($
 					}
 				};
 
-				editor.customConfig.onchange = function (html) {
-					// html 即变化之后的内容
-					// console.log(html);
-					scope.inputText = html;
-					scope.$apply();
-				};
-				editor.create();
-			}
 
-			editor.txt.html($sce.trustAsHtml(inputTextTemp));
+				return editor;
+			}
 		}
 	}
 }]);
