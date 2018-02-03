@@ -12,15 +12,19 @@ cnoteApp.directive("standardEditor", ["$window", "$sce", "$timeout", function ($
 			currentFile: "="
 		},
 		link: function (scope, ele, attrs, ctrl) {
+			var editor;
 			// console.log("content:" + content);
 			//ele[0].id = attrs['standardEditor'];
 			if (ele.children('#toolbar_' + attrs['standardEditor']).length == 0) {
 				ele.append('<div id="toolbar_' + attrs['standardEditor'] + '"></div>');
 				ele.append('<div id="text_' + attrs['standardEditor'] + '" style="height: 100%;"></div>');
-				var editor = createEditor();
-				editor.create();
+				editor = createEditor();
+				var content = scope.currentFile.content;
+				editor.txt.html($sce.trustAsHtml(content));
 				// 禁止编辑
 				editor.$textElem.attr('contenteditable', false);
+
+
 
 				scope.currentFile.editor = editor;
 
@@ -41,16 +45,8 @@ cnoteApp.directive("standardEditor", ["$window", "$sce", "$timeout", function ($
 					scope.currentFile.editor.onlyRead();
 				}
 			}
-			var content = scope.currentFile.content;
 
-			editor.txt.html($sce.trustAsHtml(content));
 
-			editor.customConfig.onchange = function (html) {
-				// html 即变化之后的内容
-				// console.log(html);
-				scope.currentFile.content = html;
-				scope.$apply();
-			};
 
 
 
@@ -114,6 +110,14 @@ cnoteApp.directive("standardEditor", ["$window", "$sce", "$timeout", function ($
 				};
 
 
+
+				editor.customConfig.onchange = function (html) {
+					// html 即变化之后的内容
+					// console.log(html);
+					scope.currentFile.content = html;
+					scope.$apply();
+				};
+				editor.create();
 				return editor;
 			}
 		}
